@@ -24,7 +24,8 @@ public class JwtUtils {
     public String generateToken(String username, User user) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", user.getUserRoleEnum().name()) // Добавляем роль в токен
+                .claim("id", user.getId()) // Добавляем роль в токен
+                .claim("role", user.getUserRoleEnum().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 час
                 .signWith(getSecretKey(), SignatureAlgorithm.HS512)
@@ -45,13 +46,13 @@ public class JwtUtils {
         }
     }
 
-    public String getUsernameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(getSecretKey()) // Извлекаем данные из токена
+    public Long getIdFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(getSecretKey())
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
+        return claims.get("id", Long.class);
     }
 
     public String getRoleFromToken(String token) {
@@ -60,6 +61,15 @@ public class JwtUtils {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get("role", String.class); // Извлекаем роль
+        return claims.get("role", String.class);
+    }
+
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSecretKey()) // Извлекаем данные из токена
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

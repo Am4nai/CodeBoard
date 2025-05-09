@@ -3,6 +3,8 @@ package com.codeboard.codeboard_backend.model;
 import com.codeboard.codeboard_backend.model.enums.ThemeEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "settings")
@@ -19,7 +21,8 @@ public class Setting {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "theme", nullable = false, columnDefinition = "theme_enum DEFAULT 'light'")
+    @Column(name = "theme", nullable = false, columnDefinition = "theme_enum DEFAULT 'LIGHT'")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private ThemeEnum themeEnum = ThemeEnum.LIGHT;
 
     @Column(name = "notifications_enabled", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")

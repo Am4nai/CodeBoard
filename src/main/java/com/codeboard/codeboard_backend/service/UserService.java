@@ -42,7 +42,6 @@ public class UserService {
 
         // Генерация JWT-токена
         String token = jwtUtils.generateToken(savedUser.getUsername(), user);
-
         // Преобразование сущности в DTO
         UserResponseDto userResponseDto = convertToResponseDto(savedUser);
 

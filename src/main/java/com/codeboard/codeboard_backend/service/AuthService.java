@@ -32,6 +32,9 @@ public class AuthService {
         // Генерация JWT-токена
         String token = jwtUtils.generateToken(user.getUsername(), user);
 
+        System.out.println("Check id from token: " + jwtUtils.getIdFromToken(token));
+        System.out.println("Check role from token: " + jwtUtils.getRoleFromToken(token));
+
         // Преобразование сущности в DTO
         UserResponseDto userResponseDto = convertToResponseDto(user);
 
