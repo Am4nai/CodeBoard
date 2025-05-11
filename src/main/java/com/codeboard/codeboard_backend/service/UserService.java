@@ -35,12 +35,11 @@ public class UserService {
             throw new RuntimeException("Пользователь с таким email уже существует");
         }
 
-        // Создание нового пользователя
         User user = new User();
         user.setUsername(userCreateDto.getUsername());
         user.setEmail(userCreateDto.getEmail());
         user.setPasswordHash(passwordEncoder.encode(userCreateDto.getPassword()));
-        user.setUserRoleEnum(UserRoleEnum.USER); // Устанавливаем роль по умолчанию
+        user.setUserRoleEnum(UserRoleEnum.USER);
 
         // Сохранение пользователя в базу данных
         User savedUser = userRepository.save(user);

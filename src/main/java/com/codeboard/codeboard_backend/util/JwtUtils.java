@@ -26,7 +26,7 @@ public class JwtUtils {
     public String generateToken(String username, User user) {
         return Jwts.builder()
                 .setSubject(username)
-                .claim("id", user.getId()) // Добавляем роль в токен
+                .claim("id", user.getId())
                 .claim("role", user.getUserRoleEnum().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 час
@@ -68,19 +68,10 @@ public class JwtUtils {
 
     public String getUsernameFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(getSecretKey()) // Извлекаем данные из токена
+                .setSigningKey(getSecretKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
-
-    public String getTokenFromContext() {
-        // Получаем токен из текущего контекста
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getCredentials() instanceof String)) {
-            throw new RuntimeException("No token found in the security context");
-        }
-        return (String) authentication.getCredentials();
     }
 }
