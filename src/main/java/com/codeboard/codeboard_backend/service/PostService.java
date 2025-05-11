@@ -16,12 +16,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.codeboard.codeboard_backend.util.JwtUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final LanguageRepository languageRepository;
     private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
 
     public Page<PostResponseDto> getAllPosts(int page, int limit) {
         Pageable pageable = PageRequest.of(page, limit);
@@ -67,6 +68,38 @@ public class PostService {
 
         // Возвращаем DTO с данными созданного поста
         return convertToDto(savedPost);
+    }
+
+    public List<PostResponseDto> getUserPostsByUsername(String username) {
+        // Находим пользователя по username
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Находим все посты пользователя
+        List<Post> posts = postRepository.findByUserId(user.getId());
+
+        // Преобразуем данные в DTO
+        return posts.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    public void deletePost(Long postId, String token) {
+        // Находим пост
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        // Проверяем, является ли пользователь автором поста
+        if (!post.getUser().getUsername().equals(jwtUtils.getUsernameFromToken(token))) {
+            // Если нет, проверяем роль пользователя
+            String role = jwtUtils.getRoleFromToken(token);
+            if (!"MODERATOR".equals(role)) {
+                throw new RuntimeException("You are not authorized to delete this post");
+            }
+        }
+
+        // Удаляем пост
+        postRepository.delete(post);
     }
 
     private PostResponseDto convertToDto(Post post) {

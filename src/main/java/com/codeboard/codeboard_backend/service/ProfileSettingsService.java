@@ -2,6 +2,7 @@ package com.codeboard.codeboard_backend.service;
 
 import com.codeboard.codeboard_backend.dto.request.ProfileSettingsUpdateDto;
 import com.codeboard.codeboard_backend.dto.response.ProfileSettingsResponseDto;
+import com.codeboard.codeboard_backend.dto.response.PublicProfileResponseDto;
 import com.codeboard.codeboard_backend.model.Profile;
 import com.codeboard.codeboard_backend.model.Setting;
 import com.codeboard.codeboard_backend.model.User;
@@ -66,6 +67,29 @@ public class ProfileSettingsService {
         dto.setWebsite(profile.getWebsite());
         dto.setTheme(settings.getThemeEnum().name());
         dto.setNotificationsEnabled(settings.getNotificationsEnabled());
+        return dto;
+    }
+
+    public PublicProfileResponseDto getPublicProfile(String username) {
+        // Находим пользователя по username
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Находим профиль пользователя
+        Profile profile = profileRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        // Преобразуем данные в DTO
+        return convertToPublicDto(user, profile);
+    }
+
+    private PublicProfileResponseDto convertToPublicDto(User user, Profile profile) {
+        PublicProfileResponseDto dto = new PublicProfileResponseDto();
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setBio(profile.getBio());
+        dto.setAvatarUrl(profile.getAvatarUrl());
+        dto.setWebsite(profile.getWebsite());
         return dto;
     }
 }

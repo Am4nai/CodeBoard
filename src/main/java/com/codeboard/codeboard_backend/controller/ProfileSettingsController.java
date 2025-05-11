@@ -2,6 +2,7 @@ package com.codeboard.codeboard_backend.controller;
 
 import com.codeboard.codeboard_backend.dto.request.ProfileSettingsUpdateDto;
 import com.codeboard.codeboard_backend.dto.response.ProfileSettingsResponseDto;
+import com.codeboard.codeboard_backend.dto.response.PublicProfileResponseDto;
 import com.codeboard.codeboard_backend.service.ProfileSettingsService;
 import com.codeboard.codeboard_backend.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,7 @@ public class ProfileSettingsController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<Void> updateProfileSettings(
+    public ResponseEntity<ProfileSettingsResponseDto> updateProfileSettings(
             @PathVariable Long userId,
             @RequestBody ProfileSettingsUpdateDto request,
             @RequestHeader("Authorization") String authHeader) {
@@ -59,18 +60,32 @@ public class ProfileSettingsController {
 
         String token = authHeader.substring(7);
 
+        // Извлекаем роль пользователя из токена
         String userRole = jwtUtils.getRoleFromToken(token);
 
         // Извлекаем ID пользователя из токена
         Long tokenId = jwtUtils.getIdFromToken(token);
 
         // Проверяем, совпадает ли ID из токена с ID из URL
+        // или является ли пользователь MODERATOR
         if (!tokenId.equals(userId) && !"MODERATOR".equals(userRole)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // Запрет доступа
         }
 
         // Обновляем данные профиля
         profileSettingsService.updateProfileSettings(userId, request);
-        return ResponseEntity.noContent().build();
+
+        // Получаем обновленные данные профиля
+        ProfileSettingsResponseDto updatedProfile = profileSettingsService.getProfileSettings(userId);
+
+        // Возвращаем 200 OK с обновленными данными
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+    @GetMapping("/public/{username}")
+    public ResponseEntity<PublicProfileResponseDto> getPublicProfile(@PathVariable String username) {
+        // Получаем публичные данные профиля по username
+        PublicProfileResponseDto response = profileSettingsService.getPublicProfile(username);
+        return ResponseEntity.ok(response);
     }
 }
