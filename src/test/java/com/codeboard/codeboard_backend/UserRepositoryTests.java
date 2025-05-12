@@ -35,29 +35,23 @@ class UserRepositoryTests {
 
     @Test
     void testAddUserWithDto() {
-        // Создание DTO для нового пользователя
         UserCreateDto userCreateDto = new UserCreateDto();
         userCreateDto.setUsername("test_user");
         userCreateDto.setEmail("test@example.com");
         userCreateDto.setPassword("password123");
 
-        // Преобразование DTO в сущность User
         User user = new User();
         user.setUsername(userCreateDto.getUsername());
         user.setEmail(userCreateDto.getEmail());
-        user.setPasswordHash(hashPassword(userCreateDto.getPassword())); // Пример хэширования пароля
+        user.setPasswordHash(hashPassword(userCreateDto.getPassword()));
         user.setUserRoleEnum(UserRoleEnum.USER);
 
-        // Сохранение пользователя
         userRepository.save(user);
 
-        // Поиск пользователя по имени
         Optional<User> foundUser = userRepository.findByUsername("test_user");
 
-        // Проверка, что пользователь найден
         assertTrue(foundUser.isPresent(), "Пользователь должен быть найден");
 
-        // Проверка полей пользователя
         assertEquals("test_user", foundUser.get().getUsername(), "Имя пользователя должно совпадать");
         assertEquals("test@example.com", foundUser.get().getEmail(), "Email должен совпадать");
         assertEquals(UserRoleEnum.USER, foundUser.get().getUserRoleEnum(), "Роль должна быть USER");
@@ -65,7 +59,6 @@ class UserRepositoryTests {
 
     @Test
     void testCreatePost() {
-        // Создание тестового пользователя
         User user = new User();
         user.setUsername("post_test_user");
         user.setEmail("post_test@example.com");
@@ -73,7 +66,6 @@ class UserRepositoryTests {
         user.setUserRoleEnum(UserRoleEnum.USER);
         userRepository.save(user);
 
-        // Создание DTO для нового поста
         PostCreateDto postCreateDto = new PostCreateDto();
         postCreateDto.setTitle("Test Post");
         postCreateDto.setContent("This is a test post content.");
@@ -81,7 +73,6 @@ class UserRepositoryTests {
         postCreateDto.setVisibility("PUBLIC");
         postCreateDto.setAuthorUsername(user.getUsername());
 
-        // Преобразование DTO в сущность Post
         Post post = new Post();
         post.setTitle(postCreateDto.getTitle());
         post.setContent(postCreateDto.getContent());
@@ -89,16 +80,12 @@ class UserRepositoryTests {
         post.setVisibility(postCreateDto.getVisibility());
         post.setAuthorUsername(postCreateDto.getAuthorUsername());
 
-        // Сохранение поста
         postRepository.save(post);
 
-        // Поиск поста по заголовку
         Optional<Post> foundPost = postRepository.findByTitle("Test Post");
 
-        // Проверка, что пост найден
         assertTrue(foundPost.isPresent(), "Пост должен быть найден");
 
-        // Проверка полей поста
         assertEquals("Test Post", foundPost.get().getTitle(), "Заголовок поста должен совпадать");
         assertEquals("This is a test post content.", foundPost.get().getContent(), "Содержимое поста должно совпадать");
         assertEquals("Java", foundPost.get().getLanguageName(), "Язык программирования должен совпадать");
@@ -108,7 +95,6 @@ class UserRepositoryTests {
 
     @Test
     void testDeletePost() {
-        // Создание тестового пользователя
         User user = new User();
         user.setUsername("delete_post_user");
         user.setEmail("delete_post@example.com");
@@ -128,38 +114,30 @@ class UserRepositoryTests {
         // Удаление поста
         postRepository.deleteById(savedPost.getId());
 
-        // Поиск удаленного поста
         Optional<Post> deletedPost = postRepository.findById(savedPost.getId());
 
-        // Проверка, что пост удален
         assertFalse(deletedPost.isPresent(), "Пост должен быть удален");
     }
 
     @Test
     void testDeleteUser() {
-        // Создание тестового пользователя
         User user = new User();
         user.setUsername("to_be_deleted");
         user.setEmail("delete@example.com");
         user.setPasswordHash(hashPassword("password123"));
         user.setUserRoleEnum(UserRoleEnum.USER);
 
-        // Сохранение пользователя
         User savedUser = userRepository.save(user);
 
-        // Удаление пользователя
         userRepository.deleteById(savedUser.getId());
 
-        // Поиск удаленного пользователя
         Optional<User> deletedUser = userRepository.findById(savedUser.getId());
 
-        // Проверка, что пользователь удален
         assertFalse(deletedUser.isPresent(), "Пользователь должен быть удален");
     }
 
     @Test
     void testUserAuthentication() {
-        // Регистрация нового пользователя
         UserCreateDto userCreateDto = new UserCreateDto();
         userCreateDto.setUsername("auth_test_user");
         userCreateDto.setEmail("auth_test@example.com");
@@ -167,19 +145,15 @@ class UserRepositoryTests {
 
         authService.registerUser(userCreateDto);
 
-        // Авторизация пользователя
         AuthResponseDto authResponse = authService.authenticateUser("auth_test_user", "password123");
 
-        // Проверка, что токен сгенерирован
         assertNotNull(authResponse.getToken(), "Токен должен быть сгенерирован");
 
-        // Проверка данных пользователя
         assertEquals("auth_test_user", authResponse.getUser().getUsername(), "Имя пользователя должно совпадать");
         assertEquals("auth_test@example.com", authResponse.getUser().getEmail(), "Email должен совпадать");
     }
 
-    // Пример метода для хэширования пароля
     private String hashPassword(String password) {
-        return passwordEncoder.encode(password); // Используем реальное хэширование
+        return passwordEncoder.encode(password);
     }
 }
