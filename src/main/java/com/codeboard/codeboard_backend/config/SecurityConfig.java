@@ -51,7 +51,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://code-board-frontend-git-main-am4nais-projects.vercel.app")); // Разрешённый домен клиента
+        configuration.setAllowedOrigins(List.of("https://code-board-frontend.vercel.app/")); // Разрешённый домен клиента
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // Разрешённые методы
         configuration.setAllowedHeaders(List.of("*")); // Разрешённые заголовки
         configuration.setAllowCredentials(true); // Если требуется отправлять куки
