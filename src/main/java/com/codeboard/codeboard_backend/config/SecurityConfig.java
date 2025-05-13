@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Настройка CORS
                 .csrf(csrf -> csrf.disable()) // Отключаем CSRF для API
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 👈 разрешаем все OPTIONS
                         .requestMatchers("/api/users/register", "/api/auth/login", "/api/auth/validate-token").permitAll()
                         .anyRequest().authenticated() // Все эндпоинты требуют аутентификации
                 )
