@@ -40,9 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/register", "/api/auth/login", "/api/auth/validate-token").permitAll()
                         .anyRequest().authenticated() // Все эндпоинты требуют аутентификации
                 )
-                .requiresChannel(channel -> channel
-                        .anyRequest().requiresSecure()  // Все запросы требуют HTTPS
-                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Без использования сессий
                 )
