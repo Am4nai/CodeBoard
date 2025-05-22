@@ -25,12 +25,11 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     public AuthResponseDto registerUser(UserCreateDto userCreateDto) {
-        // Проверка уникальности username
+
         if (userRepository.existsByUsername(userCreateDto.getUsername())) {
             throw new RuntimeException("Пользователь с таким именем уже существует");
         }
 
-        // Проверка уникальности email
         if (userRepository.existsByEmail(userCreateDto.getEmail())) {
             throw new RuntimeException("Пользователь с таким email уже существует");
         }
@@ -41,15 +40,12 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(userCreateDto.getPassword()));
         user.setUserRoleEnum(UserRoleEnum.USER);
 
-        // Сохранение пользователя в базу данных
         User savedUser = userRepository.save(user);
 
-        // Генерация JWT-токена
         String token = jwtUtils.generateToken(savedUser.getUsername(), user);
-        // Преобразование сущности в DTO
+
         UserResponseDto userResponseDto = convertToResponseDto(savedUser);
 
-        // Возвращаем токен и данные пользователя
         return new AuthResponseDto(token, userResponseDto);
     }
 
@@ -100,7 +96,7 @@ public class UserService {
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         } else {
-            // Пароль не передан, оставляем старое значение
+            // Пароль не передан, старое значение
             System.out.println("Password was not provided for user with ID: {}" + id);
         }
         if (request.getRole() != null) user.setUserRoleEnum(UserRoleEnum.valueOf(request.getRole()));

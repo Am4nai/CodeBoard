@@ -18,7 +18,6 @@ public class AdminController {
     private final UserService userService;
     private final JwtUtils jwtUtils;
 
-    // 1. Получение списка пользователей с пагинацией
     @GetMapping("/users")
     public ResponseEntity<Page<UserAResponseDto>> getUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -35,7 +34,6 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
-    // 2. Получение конкретного пользователя (по username)
     @GetMapping("/users/{username}")
     public ResponseEntity<UserAResponseDto> getUserByUsername(
             @PathVariable String username,
@@ -51,19 +49,16 @@ public class AdminController {
         return ResponseEntity.ok(user);
     }
 
-    // 3. Изменение данных пользователя
     @PutMapping("/users/{id}")
     public ResponseEntity<UserAResponseDto> updateUser(
             @PathVariable Long id,
             @RequestBody UserUpdateDto request,
             @RequestHeader("Authorization") String authHeader) {
 
-        // Проверяем роль пользователя
         if (!isNotModerator(authHeader)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // Обновляем данные пользователя
         UserAResponseDto updatedUser = userService.updateUser(id, request);
         return ResponseEntity.ok(updatedUser);
     }

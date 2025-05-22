@@ -32,7 +32,6 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> validateToken(@RequestBody TokenValidationRequest request) {
         String token = request.getToken();
 
-        // Проверка, что токен не пустой
         if (token == null || token.isEmpty()) {
             Map<String, Object> response = Map.of(
                     "valid", false,
@@ -41,7 +40,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // Проверка валидности токена
         boolean isValid = jwtUtils.validateToken(token);
 
         // Формирование ответа
